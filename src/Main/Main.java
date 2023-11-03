@@ -4,6 +4,7 @@ import Objects.Simple;
 import Objects.Complex;
 import org.jdom2.Document;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
@@ -11,6 +12,9 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        String addr = "localhost";
+        int port = 8765;
+        Sender sender = new Sender(addr, port);
         Scanner scanner = new Scanner(System.in);
         ArrayList<Object> toSerialize = new ArrayList<>();
         // Create loop that keeps asking user for objects until they want to serialize, storing created objects in an arraylist
