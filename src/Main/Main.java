@@ -4,21 +4,21 @@ import Objects.Simple;
 import Objects.Complex;
 import static Objects.TemplateCreator.*;
 import org.jdom2.Document;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Scanner;
 
 
 public class Main {
     public static void main(String[] args) {
-        String addr = "localhost";
-        int port = 8765;
-        Sender sender = new Sender(addr, port);
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Object> toSerialize = new ArrayList<>();
+        org.jdom2.Document doc;
         // Create loop that keeps asking user for objects until they want to serialize, storing created objects in an arraylist
         while (true) {
             System.out.println("Would you like to create an object? (y/n)");
@@ -30,11 +30,11 @@ public class Main {
             switch (objChoice) {
                 case 1 -> {
                     Simple simple = createSimple();
-                    toSerialize.add(simple);
+                    doc = Serializer.serialize(simple);
                 }
                 case 2 -> {
                     Complex complex = createComplex();
-                    toSerialize.add(complex);
+                    doc = Serializer.serialize(complex);
                 }
                 case 3 -> {
                     // Prompt user to either make int or char array
@@ -42,35 +42,30 @@ public class Main {
                     String arrayChoice = scanner.next();
                     if (arrayChoice.equals("int")) {
                         int[] intArray = createIntArray();
-                        toSerialize.add(intArray);
+                        doc = Serializer.serialize(intArray);
                     } else {
                         char[] charArray = createCharArray();
-                        toSerialize.add(charArray);
+                        doc = Serializer.serialize(charArray);
                     }
                 }
                 case 4 -> {
                     Object[] objectArray = createObjectArray();
-                    toSerialize.add(objectArray);
+                    doc = Serializer.serialize(objectArray);
                 }
                 default -> {
                     HashSet<?> hashSet = createHashSet();
-                    toSerialize.add(hashSet);
+                    doc = Serializer.serialize(hashSet);
                 }
             }
-        }
-
-        if (toSerialize.isEmpty()) {
-            System.out.println("No objects created! Exiting...");
-            System.exit(0);
-        }
-        // Establish network connection and send over the XML documents
-
-        // Make use of toSerialize() to keep serializing
-        System.out.println("Beginning serializiation of created objects...");
-        for (Object object : toSerialize) {
-            Document doc = Serializer.serialize(object);
-            // Log produced XML
-            // Send doc over network
+            try {
+                XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
+                StringWriter sw = new StringWriter();
+                xmlOutputter.output(doc, sw);
+            } catch (IOException e) {
+                System.out.println("Error occurred while outputting XML document!");
+                throw new RuntimeException(e);
+            }
+            Sender.send(doc);
         }
 
         System.out.println("Serialization complete! Exiting...");

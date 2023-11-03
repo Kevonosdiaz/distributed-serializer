@@ -18,7 +18,7 @@ public class Serializer {
     // private static final LinkedList<Object> serializeQueue = new LinkedList<>(); // An option for delaying serialization of referenced objects
 
     // Serialize an object, by creating a base document and attaching results of serializeBody() to it
-    public static Document serialize(Object object) {
+    public static org.jdom2.Document serialize(Object object) {
         Document doc = new Document();
         // Create an element with "serialized" tag and make it root
         Element root = new Element("serialized");

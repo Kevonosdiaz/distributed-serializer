@@ -1,24 +1,29 @@
 package Main;
 
+import org.jdom2.Document;
+import org.jdom2.output.XMLOutputter;
+
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.Formatter;
 
 public class Sender {
-    public Sender(String addr, int port) {
-        System.out.println("Sender: initializing");
-        String data = "I'm sending this data";
+
+    public static void send(Document doc) {System.out.println("Sender: initializing");
+        XMLOutputter xmlOutputter = new XMLOutputter();
+        String data = xmlOutputter.outputString(doc);
         // Use try-with-resources to auto-close
+        String addr = "localhost";
+        int port = 8765;
         try (Socket socket = new Socket(addr, port);
-             OutputStream outStream = socket.getOutputStream();
-             Formatter fmt = new Formatter(outStream);)
+             ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream()))
         {
-            System.out.println("Sender: connecting");
-            fmt.format(data);
-            fmt.flush(); // Make sure our stuff gets sent
+            System.out.println("Sender: sending");
+            outStream.writeObject(data);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+
     }
 }
