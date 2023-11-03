@@ -6,10 +6,8 @@ import org.jdom2.Element;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.LinkedList;
 
 public class Serializer {
     private static int id = 0;
@@ -39,8 +37,8 @@ public class Serializer {
         Element root = new Element("object");
         doc.setRootElement(root);
         Class <?> objClass = object.getClass();
-        seen.add(objClass.getName());
-        objects.put(objClass.getName(), id);
+        seen.add(object);
+        objects.put(object, id);
         root.setAttribute("class", objClass.getName());
         root.setAttribute("id", Integer.toString(id));
         id++;
@@ -105,33 +103,30 @@ public class Serializer {
                     Element value = new Element("value");
                     fieldElement.addContent(value);
                     value.setText("null");
-                } else {
-                    // Branch depending on whether we have a primitive or an array, or an object
-                    if (field.getType().isPrimitive()) { // Create an element with "value" tag and add it to field
-                        Element value = new Element("value");
-                        fieldElement.addContent(value);
-                        // If primitive, just set value of field to its string representation
-                        value.setText(fieldValue.toString());
-                    } else if (field.getType().isArray()) {
-                        // Run a for loop for length
-                    } else {
-                        // If an object, recursively serialize it and set value of 'reference' to its id
-                        Element reference = new Element("reference");
-                        fieldElement.addContent(reference);
-
-                        // First check if we have already serialized this object
-                        if (seen.contains(fieldValue)) {
-                            // Reference our HashMap to get the id of the object
-                            reference.setText(String.valueOf(objects.get(fieldValue)));
-                            continue;
-                        }
-                        // Recursively serialize the object if we haven't seen it before
-                        Document serializedObject = serializeBody(fieldValue);
-                        reference.setText(Integer.toString(id));
-                        root.addContent(serializedObject.getRootElement());
-                    }
+                    continue;
                 }
+                // Branch depending on whether we have a primitive or an array, or an object
+                if (field.getType().isPrimitive()) { // Create an element with "value" tag and add it to field
+                    Element value = new Element("value");
+                    fieldElement.addContent(value);
+                    // If primitive, just set value of field to its string representation
+                    value.setText(fieldValue.toString());
+                    continue;
+                }
+                // If an object, recursively serialize it and set value of 'reference' to its id
+                Element reference = new Element("reference");
+                fieldElement.addContent(reference);
 
+                // First check if we have already serialized this object
+                if (seen.contains(fieldValue)) {
+                    // Reference our HashMap to get the id of the object
+                    reference.setText(String.valueOf(objects.get(fieldValue)));
+                    continue;
+                }
+                // Recursively serialize the object if we haven't seen it before
+                Document serializedObject = serializeBody(fieldValue);
+                reference.setText(Integer.toString(id));
+                root.addContent(serializedObject.getRootElement());
             } catch (IllegalAccessException | InaccessibleObjectException e) {
                 // Make value of field show that it could not be accessed
                 Element value = new Element("value");
