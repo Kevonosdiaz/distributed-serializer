@@ -61,6 +61,8 @@ public class Main {
                 XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
                 StringWriter sw = new StringWriter();
                 xmlOutputter.output(doc, sw);
+                StringBuffer sb = sw.getBuffer();
+                System.out.println(sb.toString());
             } catch (IOException e) {
                 System.out.println("Error occurred while outputting XML document!");
                 throw new RuntimeException(e);

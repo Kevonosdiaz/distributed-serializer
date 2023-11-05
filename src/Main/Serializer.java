@@ -25,17 +25,13 @@ public class Serializer {
         doc.setRootElement(root);
 
         // Add the body of the object to the root, along with any other objects referenced by it
-        doc.addContent(serializeBody(object).getRootElement());
-
+        root.addContent(serializeBody(object));
         return doc;
     }
 
     // Serialize the body of an object, as well as any other objects referenced by it
-    public static Document serializeBody(Object object) {
-        Document doc = new Document();
-        // Create an element with "object" tag and add it to root
+    public static Element serializeBody(Object object) {
         Element root = new Element("object");
-        doc.setRootElement(root);
         Class <?> objClass = object.getClass();
         seen.add(object);
         objects.put(object, id);
@@ -75,11 +71,9 @@ public class Serializer {
                     continue;
                 }
                 // Recursively serialize the object if we haven't seen it before
-                Document serializedObject = serializeBody(arrayElement);
                 reference.setText(Integer.toString(id));
-                root.addContent(serializedObject.getRootElement());
             }
-            return doc;
+            return root;
         }
 
         // Reflectively find fields of object
@@ -124,9 +118,7 @@ public class Serializer {
                     continue;
                 }
                 // Recursively serialize the object if we haven't seen it before
-                Document serializedObject = serializeBody(fieldValue);
                 reference.setText(Integer.toString(id));
-                root.addContent(serializedObject.getRootElement());
             } catch (IllegalAccessException | InaccessibleObjectException e) {
                 // Make value of field show that it could not be accessed
                 Element value = new Element("value");
@@ -134,6 +126,6 @@ public class Serializer {
                 value.setText("Could not access field! (May be private)");
             }
         }
-        return doc;
+        return root;
     }
 }
