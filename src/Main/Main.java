@@ -58,6 +58,7 @@ public class Main {
                 }
             }
             try {
+                System.out.println("Produced XML:");
                 XMLOutputter xmlOutputter = new XMLOutputter(Format.getPrettyFormat());
                 StringWriter sw = new StringWriter();
                 xmlOutputter.output(doc, sw);

@@ -4,7 +4,8 @@ import org.jdom2.Document;
 import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 public class Sender {
@@ -15,15 +16,15 @@ public class Sender {
         // Use try-with-resources to auto-close
         String addr = "localhost";
         int port = 8765;
-        try (Socket socket = new Socket(addr, port);
-             ObjectOutputStream outStream = new ObjectOutputStream(socket.getOutputStream()))
+        try (Socket socket = new Socket(addr, port))
         {
+            OutputStream outputStream = socket.getOutputStream();
+            PrintWriter out = new PrintWriter(outputStream, true);
             System.out.println("Sender: sending");
-            outStream.writeObject(data);
+            out.println(data);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
 
     }
 }
