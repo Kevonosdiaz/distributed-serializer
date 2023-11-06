@@ -144,7 +144,7 @@ public class TemplateCreator {
     public static HashSet<Integer> createHashSetInt() {
         // Ask user for size of HashSet
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the size of the HashSet:");
+        System.out.println("Please enter the max size of the HashSet:");
         int size = scanner.nextInt();
         HashSet<Integer> hashSet = new HashSet<>(size);
         for (int i = 0; i < size; i++) {
@@ -161,7 +161,7 @@ public class TemplateCreator {
         int size = scanner.nextInt();
         HashSet<Double> hashSet = new HashSet<>(size);
         for (int i = 0; i < size; i++) {
-            System.out.println("Please enter a double value for the # " + (i+1) + " double:");
+            System.out.println("Please enter a double value for the #" + (i+1) + " double:");
             hashSet.add(scanner.nextDouble());
         }
         return hashSet;
@@ -170,11 +170,11 @@ public class TemplateCreator {
     public static HashSet<Character> createHashSetChar() {
         // Ask user for size of HashSet
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter the size of the HashSet:");
+        System.out.println("Please enter the max size of the HashSet:");
         int size = scanner.nextInt();
         HashSet<Character> hashSet = new HashSet<>(size);
         for (int i = 0; i < size; i++) {
-            System.out.println("Please enter a character value for the # " + (i+1) + " char:");
+            System.out.println("Please enter a character value for the #" + (i+1) + " char:");
             hashSet.add(scanner.next().charAt(0));
         }
         return hashSet;

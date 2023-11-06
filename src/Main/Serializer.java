@@ -80,6 +80,7 @@ public class Serializer {
         // Separate case for HashSet
         if (object instanceof HashSet<?> hashSet) {
             // Don't bother with fields at all then
+            Class<?> componentType = null;
             root.setAttribute("set-length", String.valueOf(hashSet.size()));
             for (Object hashSetElement : hashSet) {
                 if (hashSetElement == null) {
@@ -89,11 +90,14 @@ public class Serializer {
                     continue;
                 }
                 // Guaranteed to have int, double, or char
+                componentType = hashSetElement.getClass();
                 Element value = new Element("value");
                 root.addContent(value);
                 // If primitive, just set value of field to its string representation
                 value.setText(hashSetElement.toString());
             }
+            assert componentType != null;
+            root.setAttribute("component-type", componentType.getName());
             return root;
         }
 

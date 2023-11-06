@@ -105,7 +105,6 @@ public class Main {
         System.out.println("1.) Simple Object (storing primitives only)");
         System.out.println("2.) Complex Object (storing primitives and object refs)");
         System.out.println("3.) Pair of Circularly Referenced Objects");
-        // TODO Allow selection of previous objects
         System.out.println("4.) Array of Primitives");
         System.out.println("5.) Array of Object References");
         System.out.println("6.) HashSet (Java Collection)");
