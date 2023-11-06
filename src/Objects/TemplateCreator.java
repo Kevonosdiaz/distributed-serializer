@@ -27,11 +27,11 @@ public class TemplateCreator {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the following parameters for the Complex object:");
         System.out.println("Please enter an integer value for the int field:");
-        int intField = scanner.nextInt();
+        int intField = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter a double value for the double field:");
-        double doubleField = scanner.nextDouble();
+        double doubleField = Double.parseDouble(scanner.nextLine());
         System.out.println("Please enter a string value for the string field:");
-        String stringField = scanner.next();
+        String stringField = scanner.nextLine();
         Simple simpleField = createSimple();
         return new Complex(intField, doubleField, stringField, simpleField);
     }
@@ -42,11 +42,11 @@ public class TemplateCreator {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the following parameters for the Complex object:");
         System.out.println("Please enter an integer value for the int field:");
-        int intField = scanner.nextInt();
+        int intField = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter a double value for the double field:");
-        double doubleField = scanner.nextDouble();
+        double doubleField = Double.parseDouble(scanner.nextLine());
         System.out.println("Please enter a string value for the string field:");
-        String stringField = scanner.next();
+        String stringField = scanner.nextLine();
         return new Complex(intField, doubleField, stringField, null);
     }
 
@@ -55,11 +55,11 @@ public class TemplateCreator {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Please enter the following parameters for the Complex object:");
         System.out.println("Please enter an integer value for the int field:");
-        int intField = scanner.nextInt();
+        int intField = Integer.parseInt(scanner.nextLine());
         System.out.println("Please enter a double value for the double field:");
-        double doubleField = scanner.nextDouble();
+        double doubleField = Double.parseDouble(scanner.nextLine());
         System.out.println("Please enter a string value for the string field:");
-        String stringField = scanner.next();
+        String stringField = scanner.nextLine();
         Object obj = pickCreatedObject();
         return new Complex(intField, doubleField, stringField, obj);
     }
