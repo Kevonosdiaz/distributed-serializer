@@ -6,15 +6,17 @@ import org.jdom2.Element;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 
 public class Serializer {
     private static int id = 0;
-    // seen keeps track of objects we have already serialized, using its declaring class name
-    private static final HashSet<Object> seen = new HashSet<>();
+//    // seen keeps track of objects we have already serialized, using its declaring class name
+//    private static final HashSet<Object> seen = new HashSet<>();
     // objects maps each object name to its ID
     private static final IdentityHashMap<Object, Integer> objects = new IdentityHashMap<>();
+    public static final HashMap<Integer, Object> objectIDs = new HashMap<>();
     // private static final LinkedList<Object> serializeQueue = new LinkedList<>(); // An option for delaying serialization of referenced objects
 
     // Serialize an object, by creating a base document and attaching results of serializeBody() to it
@@ -33,8 +35,8 @@ public class Serializer {
     public static Element serializeBody(Object object) {
         Element root = new Element("object");
         Class <?> objClass = object.getClass();
-        seen.add(object);
         objects.put(object, id);
+        objectIDs.put(id, object); // Store this so that it can be referenced in other objects easily
         root.setAttribute("class", objClass.getName());
         root.setAttribute("id", Integer.toString(id));
         id++;
@@ -53,7 +55,7 @@ public class Serializer {
                     continue;
                 }
                 // Branch depending on whether we have a primitive or an array, or an object
-                if (arrayElement.getClass().isPrimitive()) { // Create an element with "value" tag and add it to field
+                if (arrayElement.getClass().isPrimitive() || isWrapperType(arrayElement.getClass())) { // Create an element with "value" tag and add it to field
                     Element value = new Element("value");
                     root.addContent(value);
                     // If primitive, just set value of field to its string representation
@@ -64,14 +66,33 @@ public class Serializer {
                 Element reference = new Element("reference");
                 root.addContent(reference);
 
-                // First check if we have already serialized this object
-                if (seen.contains(arrayElement)) {
+                // Reference our HashMap to get the id of the object
+                if (objects.containsKey(arrayElement)) {
                     // Reference our HashMap to get the id of the object
                     reference.setText(String.valueOf(objects.get(arrayElement)));
                     continue;
                 }
-                // Recursively serialize the object if we haven't seen it before
                 reference.setText(Integer.toString(id));
+            }
+            return root;
+        }
+
+        // Separate case for HashSet
+        if (object instanceof HashSet<?> hashSet) {
+            // Don't bother with fields at all then
+            root.setAttribute("set-length", String.valueOf(hashSet.size()));
+            for (Object hashSetElement : hashSet) {
+                if (hashSetElement == null) {
+                    Element value = new Element("value");
+                    root.addContent(value);
+                    value.setText("null");
+                    continue;
+                }
+                // Guaranteed to have int, double, or char
+                Element value = new Element("value");
+                root.addContent(value);
+                // If primitive, just set value of field to its string representation
+                value.setText(hashSetElement.toString());
             }
             return root;
         }
@@ -100,7 +121,7 @@ public class Serializer {
                     continue;
                 }
                 // Branch depending on whether we have a primitive or an array, or an object
-                if (field.getType().isPrimitive()) { // Create an element with "value" tag and add it to field
+                if (field.getType().isPrimitive() || fieldValue instanceof String || isWrapperType(field.getType())) { // Create an element with "value" tag and add it to field
                     Element value = new Element("value");
                     fieldElement.addContent(value);
                     // If primitive, just set value of field to its string representation
@@ -112,7 +133,7 @@ public class Serializer {
                 fieldElement.addContent(reference);
 
                 // First check if we have already serialized this object
-                if (seen.contains(fieldValue)) {
+                if (objects.containsKey(fieldValue)) {
                     // Reference our HashMap to get the id of the object
                     reference.setText(String.valueOf(objects.get(fieldValue)));
                     continue;
@@ -127,5 +148,18 @@ public class Serializer {
             }
         }
         return root;
+    }
+
+    // Properly check if we have a primitive class that is wrapped (in case of auto-boxing)
+    // From https://stackoverflow.com/questions/709961/determining-if-an-object-is-of-primitive-type
+    public static boolean isWrapperType(Class<?> clazz) {
+        return clazz.equals(Boolean.class) ||
+                clazz.equals(Integer.class) ||
+                clazz.equals(Character.class) ||
+                clazz.equals(Byte.class) ||
+                clazz.equals(Short.class) ||
+                clazz.equals(Double.class) ||
+                clazz.equals(Long.class) ||
+                clazz.equals(Float.class);
     }
 }
